@@ -1,0 +1,30 @@
+{
+  "name": "afin",
+  "version": "1.0.0",
+  "description": "afin cli",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "afin": "bin/index.js"
+  },
+  "keywords": [
+    "cli"
+  ],
+  "author": "xujx",
+  "license": "MIT",
+  "dependencies": {
+    "cfonts": "^2.9.1",
+    "chalk": "^4.1.0",
+    "commander": "^6.2.1",
+    "download-git-repo": "^3.0.2",
+    "glob": "^7.1.6",
+    "handlebars": "^4.7.6",
+    "inquirer": "^7.3.3",
+    "log-symbols": "^4.0.0",
+    "metalsmith": "^2.3.0",
+    "ora": "^5.2.0",
+    "rimraf": "^3.0.2"
+  }
+}
