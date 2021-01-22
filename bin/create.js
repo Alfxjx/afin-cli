@@ -14,7 +14,6 @@ const CFonts = require("cfonts");
 
 // 加入这个能获取到项目名称
 program.usage("<project-name>").parse(process.argv);
-
 // 获取项目名称
 let projectName = program.rawArgs[2];
 console.log(`项目名称: ${projectName}`);
@@ -27,6 +26,8 @@ if (!projectName) {
 const list = glob.sync("*"); // 遍历当前目录,数组类型
 let next = undefined;
 let rootName = path.basename(process.cwd());
+
+console.log(list.length);
 
 if (list.length) {
 	if (
@@ -55,6 +56,9 @@ if (list.length) {
 					next = undefined;
 				}
 			});
+	} else {
+		rootName = projectName;
+		next = Promise.resolve(projectName);
 	}
 } else if (rootName === projectName) {
 	// 如果文件名和根目录文件名一致
@@ -151,8 +155,7 @@ function go() {
 				});
 		})
 		.then((context) => {
-			console.log("生成文件");
-			console.log(context);
+			console.log("生成文件...");
 			//删除临时文件夹，将文件移动到目标目录下
 			return generator(context);
 		})
@@ -160,7 +163,7 @@ function go() {
 			// 成功用绿色显示，给出积极的反馈
 			console.log(logSymbols.success, chalk.green("创建成功:)"));
 			console.log(
-				chalk.green("cd " + context.projectRoot + "\nnpm install\nnpm start")
+				chalk.green("cd " + context.projectRoot + "\nnpm install\nnpm run serve")
 			);
 		})
 		.catch((err) => {
