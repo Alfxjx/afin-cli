@@ -27,7 +27,7 @@ const list = glob.sync("*"); // 遍历当前目录,数组类型
 let next = undefined;
 let rootName = path.basename(process.cwd());
 
-console.log(list.length);
+// console.log(list.length);
 
 if (list.length) {
 	if (
@@ -96,7 +96,7 @@ function go() {
 			if (projectRoot !== ".") {
 				fs.mkdirSync(projectRoot);
 			}
-			CFonts.say("AFIN", {
+			CFonts.say("afin-cli", {
 				font: "block", // define the font face
 				align: "left", // define text alignment
 				colors: ["#f80"], // define all colors
@@ -132,6 +132,31 @@ function go() {
 						message: "项目的简介",
 						default: `A project named ${context.projectRoot}`,
 					},
+					{
+						name: "usePass",
+						message: "是否使用密码加密库md5 & jsencrypt",
+						default: "Yes",
+					},
+					{
+						name: "useLess",
+						message: "是否使用 less",
+						default: "No",
+					},
+					{
+						name: "useScss",
+						message: "是否使用 scss",
+						default: "Yes",
+					},
+					{
+						name: "useStylus",
+						message: "是否使用 stylus",
+						default: "No",
+					},
+					{
+						name: "useEcharts",
+						message: "是否使用 echarts",
+						default: "No",
+					},
 				])
 				.then((answers) => {
 					// 可选选项回调函数
@@ -146,6 +171,14 @@ function go() {
 					// }).catch(err => {
 					//   return Promise.reject(err)
 					// })
+					let pass = answers.usePass.toUpperCase();
+					answers.usePass = pass === "YES" || pass === "Y";
+					let less = answers.useLess.toUpperCase();
+					answers.useLess = less === "YES" || less === "Y";
+					let scss = answers.useScss.toUpperCase();
+					answers.useScss = scss === "YES" || scss === "Y";
+					let styl = answers.useStylus.toUpperCase();
+					answers.useStylus = styl === "YES" || styl === "Y";
 					return {
 						...context,
 						metadata: {
@@ -163,7 +196,9 @@ function go() {
 			// 成功用绿色显示，给出积极的反馈
 			console.log(logSymbols.success, chalk.green("创建成功:)"));
 			console.log(
-				chalk.green("cd " + context.projectRoot + "\nnpm install\nnpm run serve")
+				chalk.green(
+					"cd " + context.projectRoot + "\nnpm install\nnpm run serve"
+				)
 			);
 		})
 		.catch((err) => {
