@@ -13,14 +13,25 @@ const generator = require("../lib/generator"); // 模版插入
 const CFonts = require("cfonts");
 
 // 加入这个能获取到项目名称
-program.usage("<project-name>").parse(process.argv);
+program.version("0.1.0", "-V, --version");
+program.command("create <project-name>");
+program.option("-t, --template <type>", "使用的模板");
+program.parse(process.argv);
 // 获取项目名称
-let projectName = program.rawArgs[2];
+let projectName = program.rawArgs[3];
 console.log(`项目名称: ${projectName}`);
 
 if (!projectName) {
 	program.help();
 	return;
+}
+
+const options = program.opts();
+
+if (!options.template) {
+	console.log(chalk.green("-----------使用默认模板------------"));
+} else {
+	console.log(`使用 ${options.template} 模板`);
 }
 
 const list = glob.sync("*"); // 遍历当前目录,数组类型
@@ -82,9 +93,9 @@ if (list.length) {
 	next = Promise.resolve(projectName);
 }
 
-next && go();
+next && go(options.template);
 
-function go() {
+function go(templateName) {
 	// 预留，处理子命令
 	// console.log(path.resolve(process.cwd(), path.join('.', rootName))) // 打印当前项目目录
 	// download(rootName)
@@ -106,7 +117,7 @@ function go() {
 				space: true, // define if the output text should have empty lines on top and on the bottom
 				maxLength: "0", // define how many character can be on one line
 			});
-			return download(projectRoot).then((target) => {
+			return download(projectRoot, templateName).then((target) => {
 				return {
 					projectRoot,
 					downloadTemp: target,

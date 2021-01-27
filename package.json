@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "afin-create": "./bin/create.js"
+    "afin": "./bin/create.js"
   },
   "keywords": [
     "cli"
