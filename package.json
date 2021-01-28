@@ -1,17 +1,25 @@
 {
-  "name": "afin",
-  "version": "1.0.0",
+  "name": "afin-cli",
+  "version": "0.5.0",
   "description": "afin cli",
-  "main": "index.js",
+  "main": "./bin/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "afin": "./bin/create.js"
+    "afin": "./bin/index.js"
   },
   "keywords": [
-    "cli"
+    "cli", "vue"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Alfxjx/afin-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Alfxjx/afin-cli/issues"
+  },
+  "homepage": "https://github.com/Alfxjx/afin-cli",
   "author": "xujx",
   "license": "MIT",
   "dependencies": {
@@ -26,5 +34,9 @@
     "metalsmith": "^2.3.0",
     "ora": "^5.2.0",
     "rimraf": "^3.0.2"
+  },
+  "devDependencies": {
+    "request": "^2.88.2",
+    "semver": "^7.3.4"
   }
 }
