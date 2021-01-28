@@ -14,7 +14,9 @@ const remove = require("../lib/remove"); // 删除文件js
 const generator = require("../lib/generator"); // 模版插入
 const CFonts = require("cfonts");
 
-program.version("0.5.0");
+program.version(
+	JSON.parse(fs.readFileSync("../package.json", "utf-8")).version
+);
 
 program
 	.command("create <projectName>")
