@@ -1,13 +1,13 @@
 {
   "name": "afin-cli",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "description": "afin cli",
   "main": "./bin/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "bfin": "./bin/index.js"
+    "afin": "./bin/index.js"
   },
   "keywords": [
     "cli",

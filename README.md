@@ -16,14 +16,8 @@ afin create test -t vue
 
 ## 开发计划
 
-v0.6.0: 可选的模板地址功能。
-v0.6.3: 默认可选 -d --default
-v0.6.5: 脚手架自己升级 `afin u` 
-v0.6.7: 自行安装依赖，设置选择的pm,优先级（yarn npm etc..）
-
-// TODO lint
-  src\api\config.js
-  src\components\afin\AfinScrolltop.vue
-  src\directives\clickout.js 
-
-// TODO main.js clickout.js typo
+v0.5.6: 默认可选 -d --default
+v0.5.6: 脚手架自己升级 `afin u` 
+v0.5.7: 可选的模板地址功能。
+v0.5.8: 自行安装依赖，设置选择的pm,优先级（yarn npm etc..）
+v0.6.0: run bootstrap
