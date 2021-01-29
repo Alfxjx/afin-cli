@@ -1,16 +1,17 @@
 {
   "name": "afin-cli",
-  "version": "0.5.3",
+  "version": "0.5.1",
   "description": "afin cli",
   "main": "./bin/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "afin": "./bin/index.js"
+    "bfin": "./bin/index.js"
   },
   "keywords": [
-    "cli", "vue"
+    "cli",
+    "vue"
   ],
   "repository": {
     "type": "git",

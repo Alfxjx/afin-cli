@@ -13,16 +13,16 @@ const logSymbols = require("log-symbols");
 const remove = require("../lib/remove"); // 删除文件js
 const generator = require("../lib/generator"); // 模版插入
 const CFonts = require("cfonts");
+const checkPackageVersion = require("../lib/utils").checkPackageVersion;
 
-program.version(
-	JSON.parse(fs.readFileSync("../package.json", "utf-8")).version
-);
+program.version(require("../package").version);
 
 program
 	.command("create <projectName>")
 	.alias("c")
-	.description("新建模板  -t/--template 选择模板")
+	.description("新建模板  -t/--template 选择模板 -d/--default 全默认")
 	.option("-t, --template <type>", "使用的模板")
+	.option("-d --default", "全默认模式")
 	.action((projectName, options) => {
 		checkNodeVersion();
 		console.log(`项目名称: ${projectName}`);
@@ -91,10 +91,14 @@ program
 			rootName = projectName;
 			next = Promise.resolve(projectName);
 		}
+		let isDefault = false;
+		if (options.default === true) {
+			isDefault = true;
+		}
 
-		next && go(options.template);
+		next && go(options.template, isDefault);
 
-		function go(templateName) {
+		function go(templateName, isDefault) {
 			// 预留，处理子命令
 			// console.log(path.resolve(process.cwd(), path.join('.', rootName))) // 打印当前项目目录
 			// download(rootName)
@@ -116,86 +120,108 @@ program
 						space: true, // define if the output text should have empty lines on top and on the bottom
 						maxLength: "0", // define how many character can be on one line
 					});
-					return download(projectRoot, templateName).then((target) => {
-						return {
-							projectRoot,
-							downloadTemp: target,
-						};
-					});
+					return download(projectRoot, templateName, isDefault).then(
+						(target) => {
+							return {
+								projectRoot,
+								downloadTemp: target,
+								isDefault: isDefault,
+							};
+						}
+					);
 				})
 				.then((context) => {
-					// console.log(context)
-					return inquirer
-						.prompt([
-							{
-								name: "projectName",
-								message: "项目的名称",
-								default: context.name,
-							},
-							{
-								name: "projectVersion",
-								message: "项目的版本号",
-								default: "1.0.0",
-							},
-							{
-								name: "projectDescription",
-								message: "项目的简介",
-								default: `A project named ${context.projectRoot}`,
-							},
-							{
-								name: "usePass",
-								message: "是否使用密码加密库md5 & jsencrypt",
-								default: "Yes",
-							},
-							{
-								name: "useLess",
-								message: "是否使用 less",
-								default: "No",
-							},
-							{
-								name: "useScss",
-								message: "是否使用 scss",
-								default: "Yes",
-							},
-							{
-								name: "useStylus",
-								message: "是否使用 stylus",
-								default: "No",
-							},
-							{
-								name: "useEcharts",
-								message: "是否使用 echarts",
-								default: "No",
-							},
-						])
-						.then((answers) => {
-							// 可选选项回调函数
-							// return latestVersion('macaw-ui').then(version => {
-							//   answers.supportUiVersion = version
-							//   return {
-							//     ...context,
-							//     metadata: {
-							//       ...answers
-							//     }
-							//   }
-							// }).catch(err => {
-							//   return Promise.reject(err)
-							// })
-							let pass = answers.usePass.toUpperCase();
-							answers.usePass = pass === "YES" || pass === "Y";
-							let less = answers.useLess.toUpperCase();
-							answers.useLess = less === "YES" || less === "Y";
-							let scss = answers.useScss.toUpperCase();
-							answers.useScss = scss === "YES" || scss === "Y";
-							let styl = answers.useStylus.toUpperCase();
-							answers.useStylus = styl === "YES" || styl === "Y";
-							return {
-								...context,
-								metadata: {
-									...answers,
+					if (context.isDefault) {
+						console.log(chalk.cyan("使用默认模式…"));
+						return {
+							...context,
+							metadata: {
+								projectName: context.projectRoot,
+								projectVersion: "1.0.0",
+								projectDescription: `A project named ${context.projectRoot}`,
+								usePass: true,
+								useLess: false,
+								useScss: true,
+								useStylus: false,
+								useEcharts: false,
+							}
+						}
+					} else {
+						console.log(chalk.cyan("开始自定义配置…"));
+						return inquirer
+							.prompt([
+								{
+									name: "projectName",
+									message: "项目的名称",
+									default: context.projectRoot,
 								},
-							};
-						});
+								{
+									name: "projectVersion",
+									message: "项目的版本号",
+									default: "1.0.0",
+								},
+								{
+									name: "projectDescription",
+									message: "项目的简介",
+									default: `A project named ${context.projectRoot}`,
+								},
+								{
+									name: "usePass",
+									message: "是否使用密码加密库md5 & jsencrypt",
+									default: "Yes",
+								},
+								{
+									name: "useLess",
+									message: "是否使用 less",
+									default: "No",
+								},
+								{
+									name: "useScss",
+									message: "是否使用 scss",
+									default: "Yes",
+								},
+								{
+									name: "useStylus",
+									message: "是否使用 stylus",
+									default: "No",
+								},
+								{
+									name: "useEcharts",
+									message: "是否使用 echarts",
+									default: "No",
+								},
+							])
+							.then((answers) => {
+								// 可选选项回调函数
+								// return latestVersion('macaw-ui').then(version => {
+								//   answers.supportUiVersion = version
+								//   return {
+								//     ...context,
+								//     metadata: {
+								//       ...answers
+								//     }
+								//   }
+								// }).catch(err => {
+								//   return Promise.reject(err)
+								// })
+								let pass = answers.usePass.toUpperCase();
+								answers.usePass = pass === "YES" || pass === "Y";
+								let less = answers.useLess.toUpperCase();
+								answers.useLess = less === "YES" || less === "Y";
+								let scss = answers.useScss.toUpperCase();
+								answers.useScss = scss === "YES" || scss === "Y";
+								let styl = answers.useStylus.toUpperCase();
+								answers.useStylus = styl === "YES" || styl === "Y";
+								let echarts = answers.useEcharts.toUpperCase();
+								answers.useEcharts = echarts === "YES" || echarts === "Y";
+								return {
+									...context,
+									metadata: {
+										...answers,
+									},
+								};
+							});
+					}
 				})
 				.then((context) => {
 					console.log("生成文件...");
@@ -203,7 +229,6 @@ program
 					return generator(context);
 				})
 				.then((context) => {
-					// 成功用绿色显示，给出积极的反馈
 					console.log(logSymbols.success, chalk.green("创建成功:)"));
 					console.log(
 						chalk.green(
@@ -227,8 +252,10 @@ program
 	.command("upgrade")
 	.alias("u")
 	.description("升级脚手架")
-	.action(() => {
-		console.log("upgrading ....");
+	.action((cmd) => {
+		const version = cmd.parent._version;
+		console.log(`当前版本 ${version}`);
+		checkPackageVersion("https://registry.npmjs.org/afin-cli", version);
 	});
 
 program.parse(process.argv);
