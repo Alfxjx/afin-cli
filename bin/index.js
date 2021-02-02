@@ -15,6 +15,7 @@ const generator = require("../lib/generator"); // 模版插入
 const CFonts = require("cfonts");
 const checkPackageVersion = require("../lib/utils").checkPackageVersion;
 const useAdmin = require("../lib/useAdmin");
+const choose = require("../lib/choose");
 
 program.version(require("../package").version);
 
@@ -24,22 +25,21 @@ program
 	.description("新建模板  -t/--template 选择模板 -d/--default 全默认")
 	.option("-t, --template <type>", "使用的模板")
 	.option("-d --default", "全默认模式")
-	.action((projectName, options) => {
+	.action(async (projectName, options) => {
 		checkNodeVersion();
 		console.log(`项目名称: ${projectName}`);
+
+		const list = glob.sync("*"); // 遍历当前目录,数组类型
+		let next = undefined;
+		let rootName = path.basename(process.cwd());
+		let t = undefined;
 		if (!options.template) {
-			console.log(chalk.green("-----------使用默认模板------------"));
 		} else {
 			console.log(
 				chalk.green(`-----------使用 ${options.template} 模板-----------`)
 			);
+			t = options.template;
 		}
-		const list = glob.sync("*"); // 遍历当前目录,数组类型
-		let next = undefined;
-		let rootName = path.basename(process.cwd());
-
-		// console.log(list.length);
-
 		if (list.length) {
 			if (
 				list.some((n) => {
@@ -61,7 +61,7 @@ program
 						if (answer.isRemovePro) {
 							remove(path.resolve(process.cwd(), projectName));
 							rootName = projectName;
-							return Promise.resolve(projectName);
+							return choose(t, projectName);
 						} else {
 							console.log("停止创建");
 							next = undefined;
@@ -69,7 +69,7 @@ program
 					});
 			} else {
 				rootName = projectName;
-				next = Promise.resolve(projectName);
+				next = choose(t, projectName);
 			}
 		} else if (rootName === projectName) {
 			// 如果文件名和根目录文件名一致
@@ -86,28 +86,24 @@ program
 				])
 				.then((answer) => {
 					console.log(answer.buildInCurrent);
-					return Promise.resolve(answer.buildInCurrent ? "." : projectName);
+					return choose(t, answer.buildInCurrent ? "." : projectName);
 				});
 		} else {
 			rootName = projectName;
-			next = Promise.resolve(projectName);
+			next = choose(t, projectName);
 		}
+		// console.log(list.length);
 		let isDefault = false;
 		if (options.default === true) {
 			isDefault = true;
 		}
-
-		next && go(options.template, isDefault);
+		await next;
+		await go(options.template, isDefault);
 
 		function go(templateName, isDefault) {
-			// 预留，处理子命令
-			// console.log(path.resolve(process.cwd(), path.join('.', rootName))) // 打印当前项目目录
-			// download(rootName)
-			//   .then(target => console.log(target))
-			//   .catch(err => console.log(err))
 			next
-				.then((projectRoot) => {
-					//
+				.then((ans) => {
+					const [projectRoot, template] = ans;
 					if (projectRoot !== ".") {
 						fs.mkdirSync(projectRoot);
 					}
@@ -121,6 +117,9 @@ program
 						space: true, // define if the output text should have empty lines on top and on the bottom
 						maxLength: "0", // define how many character can be on one line
 					});
+					templateName === undefined
+						? (templateName = template)
+						: (templateName = templateName);
 					return download(projectRoot, templateName, isDefault).then(
 						(target) => {
 							return {
