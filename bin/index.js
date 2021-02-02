@@ -14,6 +14,7 @@ const remove = require("../lib/remove"); // 删除文件js
 const generator = require("../lib/generator"); // 模版插入
 const CFonts = require("cfonts");
 const checkPackageVersion = require("../lib/utils").checkPackageVersion;
+const useAdmin = require("../lib/useAdmin");
 
 program.version(require("../package").version);
 
@@ -126,11 +127,18 @@ program
 								projectRoot,
 								downloadTemp: target,
 								isDefault: isDefault,
+								templateName: templateName,
 							};
 						}
 					);
 				})
 				.then((context) => {
+					if (context.templateName === "admin") {
+						console.log(chalk.cyan("use vue-element-admin…"));
+						return {
+							...context,
+						};
+					}
 					if (context.isDefault) {
 						console.log(chalk.cyan("使用默认模式…"));
 						return {
@@ -143,96 +151,94 @@ program
 								useLess: false,
 								useScss: true,
 								useStylus: false,
-								useEcharts: false,
-							}
-						}
+								useEcharts: context.templateName === "pro" ? true : false,
+							},
+						};
 					} else {
 						console.log(chalk.cyan("开始自定义配置…"));
-						return inquirer
-							.prompt([
-								{
-									name: "projectName",
-									message: "项目的名称",
-									default: context.projectRoot,
-								},
-								{
-									name: "projectVersion",
-									message: "项目的版本号",
-									default: "1.0.0",
-								},
-								{
-									name: "projectDescription",
-									message: "项目的简介",
-									default: `A project named ${context.projectRoot}`,
-								},
-								{
-									name: "usePass",
-									message: "是否使用密码加密库md5 & jsencrypt",
-									default: "Yes",
-								},
-								{
-									name: "useLess",
-									message: "是否使用 less",
-									default: "No",
-								},
-								{
-									name: "useScss",
-									message: "是否使用 scss",
-									default: "Yes",
-								},
-								{
-									name: "useStylus",
-									message: "是否使用 stylus",
-									default: "No",
-								},
-								{
-									name: "useEcharts",
-									message: "是否使用 echarts",
-									default: "No",
-								},
-							])
-							.then((answers) => {
-								// 可选选项回调函数
-								// return latestVersion('macaw-ui').then(version => {
-								//   answers.supportUiVersion = version
-								//   return {
-								//     ...context,
-								//     metadata: {
-								//       ...answers
-								//     }
-								//   }
-								// }).catch(err => {
-								//   return Promise.reject(err)
-								// })
-								let pass = answers.usePass.toUpperCase();
-								answers.usePass = pass === "YES" || pass === "Y";
-								let less = answers.useLess.toUpperCase();
-								answers.useLess = less === "YES" || less === "Y";
-								let scss = answers.useScss.toUpperCase();
-								answers.useScss = scss === "YES" || scss === "Y";
-								let styl = answers.useStylus.toUpperCase();
-								answers.useStylus = styl === "YES" || styl === "Y";
-								let echarts = answers.useEcharts.toUpperCase();
-								answers.useEcharts = echarts === "YES" || echarts === "Y";
-								return {
-									...context,
-									metadata: {
-										...answers,
-									},
-								};
+						let configureList = [
+							{
+								name: "projectName",
+								message: "项目的名称",
+								default: context.projectRoot,
+							},
+							{
+								name: "projectVersion",
+								message: "项目的版本号",
+								default: "1.0.0",
+							},
+							{
+								name: "projectDescription",
+								message: "项目的简介",
+								default: `A project named ${context.projectRoot}`,
+							},
+							{
+								name: "usePass",
+								message: "是否使用密码加密库md5 & jsencrypt",
+								default: "Yes",
+							},
+							{
+								name: "useLess",
+								message: "是否使用 less",
+								default: "No",
+							},
+							{
+								name: "useScss",
+								message: "是否使用 scss",
+								default: "Yes",
+							},
+							{
+								name: "useStylus",
+								message: "是否使用 stylus",
+								default: "No",
+							},
+						];
+						if (context.templateName !== "pro") {
+							configureList.push({
+								name: "useEcharts",
+								message: "是否使用 echarts",
+								default: "No",
 							});
+						}
+						return inquirer.prompt(configureList).then((answers) => {
+							let pass = answers.usePass.toUpperCase();
+							answers.usePass = pass === "YES" || pass === "Y";
+							let less = answers.useLess.toUpperCase();
+							answers.useLess = less === "YES" || less === "Y";
+							let scss = answers.useScss.toUpperCase();
+							answers.useScss = scss === "YES" || scss === "Y";
+							let styl = answers.useStylus.toUpperCase();
+							answers.useStylus = styl === "YES" || styl === "Y";
+							let echarts = answers.useEcharts
+								? answers.useEcharts.toUpperCase()
+								: "Y";
+							answers.useEcharts = echarts === "YES" || echarts === "Y";
+							return {
+								...context,
+								metadata: {
+									...answers,
+								},
+							};
+						});
 					}
 				})
 				.then((context) => {
 					console.log("生成文件...");
-					//删除临时文件夹，将文件移动到目标目录下
-					return generator(context);
+					if (context.templateName === "admin") {
+						console.log(chalk.yellow("自行修改meta, XD"));
+						return useAdmin(context);
+					} else {
+						//删除临时文件夹，将文件移动到目标目录下
+						return generator(context);
+					}
 				})
 				.then((context) => {
 					console.log(logSymbols.success, chalk.green("创建成功:)"));
+					console.log(chalk.green("cd " + context.projectRoot));
+					console.log(chalk.green("npm install"));
 					console.log(
 						chalk.green(
-							"cd " + context.projectRoot + "\nnpm install\nnpm run serve"
+							context.templateName === "admin" ? "npm run dev" : "npm run serve"
 						)
 					);
 				})

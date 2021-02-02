@@ -12,12 +12,21 @@ afin create test -t vue
 
 # 直接输入 afin 显示具体操作
 ```
+
 安装的模板文件目前在[这里](https://github.com/Alfxjx/cli-template)
+
+1. vue 最小化的vue模板
+2. pro 带一个element-ui示例的页面
+3. admin 拉取[vue-element-admin](https://panjiachen.github.io/vue-element-admin/#/dashboard)模板
 
 ## 开发计划
 
 v0.5.6: 默认可选 -d --default
-v0.5.6: 脚手架自己升级 `afin u` 
-v0.5.7: 可选的模板地址功能。
-v0.5.8: 自行安装依赖，设置选择的pm,优先级（yarn npm etc..）
-v0.6.0: run bootstrap
+v0.5.6: 脚手架自己升级 `afin u`
+v0.5.8: 可选的模板地址功能
+v0.6.0: 修改使用admin模板的配置bug
+v0.6.5: 自行安装依赖，设置选择的 pm,优先级（yarn npm etc..）
+
+## 存在的bug
+
+1. ~~使用pro模板的时候 必选echarts,实际上echarts可以被不选择。fixed in v0.6.0~~
