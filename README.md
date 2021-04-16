@@ -7,8 +7,18 @@
 安装方法 `npm i -g afin-cli`，在一个新的目录下，运行`afin create <项目名称>`。
 
 ```bash
+# npm i -g @afin/cli
+
+# 新建项目
+afin create <name>
 # -t 表示使用模板，可选参数，目前默认是vue
 afin create test -t vue
+
+# 显示帮助
+afin -h / afin --help
+
+# 升级
+afin -u / afin --upgrade
 
 # 直接输入 afin 显示具体操作
 ```
