@@ -1,5 +1,7 @@
 # @afin/cli
 
+**注意： 现在由于隐私问题原有的模板下线了，之后会脱敏一个可用的 cli-tempplate**
+
 和金融前端脚手架(Vue 全家桶+element-ui+echarts@5)
 
 ## 用法
